@@ -60,6 +60,8 @@ public class StartActivity extends AppCompatActivity {
         internalStorage = new InternalStorage();
         internalStorage.setContext(this);
 
+        if(getIntent().getBooleanExtra("Exit", false)) finish();
+
         locationDataList = internalStorage.readLocationDataList();
         Log.v(TAG, "onCreate, locationDataList" + locationDataList);
 
@@ -143,6 +145,14 @@ public class StartActivity extends AppCompatActivity {
                 intent = new Intent(this, HelpActivity.class);
                 this.startActivity(intent);
                 return true;
+            case R.id.menuItemExit:
+                /*if (HelpActivity.class!=null){
+                    HelpActivity.finish();
+                }*/
+                //getActivity().finish();
+                //new commit  jjj
+                System.exit(0);
+                //return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -154,5 +164,19 @@ public class StartActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    protected void onResume(){
+        super.onResume();
+    }
 
+    protected void onPause(){
+        super.onPause();
+    }
+
+    protected void onStop(){
+        super.onStop();
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
+    }
 }

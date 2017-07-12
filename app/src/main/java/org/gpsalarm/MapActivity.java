@@ -155,7 +155,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Google map searching by address name
         // See https://g.co/AppIndexing/AndroidStudio for more information.
-        /** TODO Fix app crash, after pressing Add alarm*/
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -398,6 +397,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 intent = new Intent(this, HelpActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.menuItemExit:
+                intent = new Intent(this, StartActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("Exit", true);
+                startActivity(intent);
+                finish();
+                //System.exit(0); //only kills this method and reloads StartActivity.java
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -429,8 +435,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             }
                         }
                         addLocationDataToList(name, marker);
-                        //FIXME Crashes app when "Save as" is pressed
-                        // Possible fix - comment/delete everything associated with "Search Location" button as they could overlap
                         MapActivity.this.marker.hideInfoWindow();
                     }
                 });
@@ -483,7 +487,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     if (!isFinishing()) { // check that activity window is not closing
                         final PopupWindow popupWindow = new PopupWindow(layout, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
                         popupWindow.showAtLocation(layout, Gravity.CENTER, 0, 0);
-                        popupWindow.setOutsideTouchable(false);   // Set these twho to true, if want to be clickable outside window
+                        popupWindow.setOutsideTouchable(false);   // Set these two to true, if want to be clickable outside window
                         popupWindow.setFocusable(false);
                         // TODO should check, if both handlers are necessary
                         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
@@ -677,9 +681,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         if (getEstimate() != Estimate.DISABLED) { // Renew alarm schedule, if scheduler should be used
             AlarmReceiver alarmReceiver = new AlarmReceiver();
             alarmReceiver.setAlarm(this, interval);
-            Log.v("renewLocationRequest", "alarm reshceduled after:" + interval);
+            Log.v("renewLocationRequest", "alarm rescheduled after:" + interval);
         }
-        hanldleLastLocation();
+        handleLastLocation();
     }
 
     void stopLocationRequest() { //NOTE: Stop tracking location
@@ -727,7 +731,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         Builder mBuilder = new Builder(this)
                 .setSmallIcon(R.drawable.ic_launcher_web)
                 .setContentTitle("GPSAlarm")
-                .setContentText("Programm Running")
+                .setContentText("Program Running")
                 .setOngoing(true)
                 .setAutoCancel(false)
                 .setPriority(Notification.PRIORITY_MIN);
@@ -770,12 +774,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         return Estimate.NEAR;         // less than 2 minutes for ongoing, or new request
     }
 
-    void hanldleLastLocation() {
-        Log.v("hanldleLastLocation", "started");
+    void handleLastLocation() {
+        Log.v("handleLastLocation", "started");
         Location target = internalStorage.readLocation(TARGET_ID);
         Location location = internalStorage.readLocation(LOCATION_ID);
         if (target == null || location == null) {
-            Log.d("hanldleLastLocation", "target: " + target + " location:" + location);
+            Log.d("handleLastLocation", "target: " + target + " location:" + location);
             return;
         }
         double distance = 0;
@@ -784,7 +788,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Check if reached destination
         if (distance <= alarmRadius) {
             if (!userNotified) {
-                //  lock is aquired in AlarmReceiver
+                //  lock is acquired in AlarmReceiver
                 Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 v.vibrate(new long[]{0, 300, 300, 300, 300, 600}, -1); // vibrate with pattern
                 mediaPlayer.start();
@@ -796,20 +800,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                         (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                 notificationManager.cancel(NOTIFICATION_ID);
             }
-            Log.i("hanldleLastLocation", "destination reached");
+            Log.i("handleLastLocation", "destination reached");
         } else {
             // Else set interval for location, depending on distance
             interval = (int) (3600 * distance / maximumSpeed); // distance is in m, but speed in km
             if (interval < MIN_INTERVAL) interval = MIN_INTERVAL; // preserve minimal interval to 1s
             internalStorage.writeInterval(interval);
             if (getEstimate() == Estimate.NEAR) {
-                Log.d("hanldleLastLocation", "wakeLock hold");
+                Log.d("handleLastLocation", "wakeLock hold");
             } else {
                 alarm.releaseWakeLock();
-                Log.d("hanldleLastLocation", "wakeLock released");
+                Log.d("handleLastLocation", "wakeLock released");
             }
         }
-        Log.d("hanldleLastLocation", "" +
+        Log.d("handleLastLocation", "" +
                 "\nmaxSpeed: " + String.valueOf(maximumSpeed) + "km/h" +
                 "\nalarmRad: " + alarmRadius + "m" +
                 "\ninterval: " + interval + "s" +
@@ -823,5 +827,21 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             internalStorage = new InternalStorage();
         if (internalStorage.getContext() == null)
             internalStorage.setContext(this);
+    }
+
+    protected void onResume(){
+        super.onResume();
+    }
+
+    protected void onPause(){
+        super.onPause();
+    }
+
+    protected void onStop(){
+        super.onStop();
+    }
+
+    protected void onDestroy(){
+        super.onDestroy();
     }
 }
