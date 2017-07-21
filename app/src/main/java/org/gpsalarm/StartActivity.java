@@ -196,14 +196,14 @@ public class StartActivity extends AppCompatActivity {
                     double destLng = addressGeo.longitude;
                     setDestinationLat(destLat);
                     setDestinationLng(destLng);
-                    Intent serviceIntent = new Intent(StartActivity.this, CoordService.class);
-                    serviceIntent.putExtra("DestLat", destLat);
-                    serviceIntent.putExtra("DestLng", destLng);
-                    startService(serviceIntent);
                     destPassed = true;
                     currentlyTracking = true;
                     triggerAlarmManager();
                     setButtonState();
+                    Intent serviceIntent = new Intent(StartActivity.this, CoordService.class);
+                    serviceIntent.putExtra("DestLat", destLat);
+                    serviceIntent.putExtra("DestLng", destLng);
+                    startService(serviceIntent);
                 } else {
                     Toast.makeText(getApplicationContext(), "No such location found. \nTry a different keyword.", Toast.LENGTH_LONG).show();
                 }
@@ -278,6 +278,7 @@ public class StartActivity extends AppCompatActivity {
     @Override
     protected void onDestroy(){
         unregisterReceiver(updateLocation);
+        stopAlarmManager();
         super.onDestroy();
         Log.i(TAG, "onDestroy(StartActivity) called");
     }

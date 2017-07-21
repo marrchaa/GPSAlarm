@@ -126,7 +126,6 @@ public class CoordService extends Service implements
             // we have our desired accuracy of 500 meters so lets quit this service,
             // onDestroy will be called and stop our location updates
             if (location.getAccuracy() < 500.0f) {
-                stopLocationUpdates();
             }
         }
     }
@@ -147,9 +146,9 @@ public class CoordService extends Service implements
         Log.d(TAG, "onConnected");
 
         locationRequest = LocationRequest.create();
-        locationRequest.setInterval(5000); // milliseconds
-        locationRequest.setFastestInterval(1000); // the fastest rate in milliseconds at which your app can handle location updates
-        locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        locationRequest.setInterval(1*60*1000); // milliseconds
+        //locationRequest.setFastestInterval(1000); // the fastest rate in milliseconds at which your app can handle location updates
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         try{
             LocationServices.FusedLocationApi.requestLocationUpdates(
