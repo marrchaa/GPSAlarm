@@ -7,16 +7,15 @@
     android:layout_height="match_parent">
 
      <Button
-        android:text="To Map"
+        android:text="Tracking OFF"
         android:layout_height="60dp"
          android:background="@android:color/holo_green_light"
-        android:id="@+id/ToMap"
+        android:id="@+id/tracker"
          android:layout_marginBottom="0dp"
         android:layout_width="match_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:onClick="toMap"
         tools:ignore="HardcodedText"
         tools:layout_below="@+id/listView" />
 
